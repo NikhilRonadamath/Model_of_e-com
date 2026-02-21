@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../models/product.dart';
+import '../../services/product_service.dart';
 import '../../widgets/category_button.dart';
 import '../widgets/product_card.dart';
 import '../widgets/category_button.dart';
@@ -143,24 +145,43 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                return ProductCard(
-                  title: 'Product ${index + 1}',
-                  price: '\$${50 + (index * 10)}',
-                  rating: 4.5 + (index * 0.1),
-                  reviewCount: 120 + (index * 15),
-                  imageUrl: 'assets/product_$index.png',
+            FutureBuilder<List<Product>>(
+              future: ProductService.fetchProducts(),   // your API method
+              builder: (context, snapshot) {
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+
+                final products = snapshot.data!;
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.7,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+
+                    final p = products[index];
+
+                    return ProductCard(
+                      title: p.title,
+                      price: "₹${p.price}",
+                      rating: p.rating ?? 0,
+                      reviewCount: p.reviewCount ?? 0,
+                      imageUrl: p.imageUrl,   // firebase image URL
+                    );
+                  },
                 );
               },
             ),

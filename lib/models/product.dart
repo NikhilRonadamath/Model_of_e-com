@@ -1,46 +1,25 @@
-
 class Product {
-  final String id;
-  final String name;
-  final String description;
+  final String title;
   final double price;
+  final double? rating;
+  final int? reviewCount;
   final String imageUrl;
-  final double rating;
-  final String category;
 
   Product({
-    required this.id,
-    required this.name,
-    //done
-    required this.description,
+    required this.title,
     required this.price,
+    this.rating,
+    this.reviewCount,
     required this.imageUrl,
-    required this.rating,
-    required this.category,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String,
+      title: json['title'],
       price: (json['price'] as num).toDouble(),
-      imageUrl: json['imageUrl'] as String,
-      rating: (json['rating'] as num).toDouble(),
-      category: json['category'] as String,
+      rating: (json['rating'] as num?)?.toDouble(),
+      reviewCount: json['reviewCount'] as int?,   // ⭐ important
+      imageUrl: json['imageUrl'],
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'price': price,
-      'imageUrl': imageUrl,
-      'rating': rating,
-      'category': category,
-    };
-  }
 }
-
